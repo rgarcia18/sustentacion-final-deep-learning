@@ -25,8 +25,8 @@ Este trabajo implementa inferencia funcional sobre dos modelos de reconocimiento
 
 > **Sekoyan, M., Koluguri, N. R., Tadevosyan, N., Zelasko, P., Bartley, T., Karpov, N., Balam, J., & Ginsburg, B. (2025). *Canary-1B-v2 & Parakeet-TDT-0.6B-v3: Efficient and High-Performance Models for Multilingual ASR and AST*. NVIDIA.**
 
-- 📄 Artículo completo (PDF): [arxiv.org/pdf/2509.14128](https://arxiv.org/pdf/2509.14128)
-- 🤗 HuggingFace Papers: [huggingface.co/papers/2509.14128](https://huggingface.co/papers/2509.14128)
+- Artículo completo (PDF): [arxiv.org/pdf/2509.14128](https://arxiv.org/pdf/2509.14128)
+- HuggingFace Papers: [huggingface.co/papers/2509.14128](https://huggingface.co/papers/2509.14128)
 - Modelo Canary-1B-v2: [huggingface.co/nvidia/canary-1b-v2](https://huggingface.co/nvidia/canary-1b-v2)
 - Modelo Parakeet-TDT-0.6B-v3: [huggingface.co/nvidia/parakeet-tdt-0.6b-v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3)
 - Framework NeMo: [github.com/NVIDIA/NeMo](https://github.com/NVIDIA/NeMo)
@@ -568,33 +568,6 @@ Este proyecto permitió comprender en profundidad el funcionamiento de una arqui
 4. **Limitaciones observadas:** La implementación requiere recursos de GPU no triviales; para idiomas muy distintos del conjunto europeo la generalización es incierta; el fine-tuning en datos de dominio estrecho puede causar olvido catastrófico.
 
 5. **Mejoras futuras:** Explorar cuantización INT8/FP16 para CPU, implementar streaming en tiempo real, y evaluar en idiomas no europeos.
-
----
-
-## 8. Changelog
-
-### v1.3.0 — 2026-05-28
-- Añadida sección 5.3: ejecución en Google Colab con GPU T4 gratuita
-- Interfaz Streamlit expuesta mediante ngrok (reemplaza cloudflared — más estable para conexiones largas)
-- Notebook `Canary_Parakeet_Demo.ipynb` reescrito: sin emojis, sin markdown verboso, código limpio
-- Corrección: `pnc=False` → `pnc="no"` en todas las llamadas a `canary.transcribe()` (NeMo espera string, no booleano)
-- Tabla comparativa Colab vs. ejecución local en sección 5.3
-
-### v1.2.0 — 2026-05-27
-- Añadido `Canary_Parakeet_Demo.ipynb`: notebook de Google Colab con inferencia, visualizaciones (mel-spectrogram, RTFx benchmark, diagrama Q/K/V) e interfaz Streamlit integrada
-- Sección 8 del notebook: lanzamiento de Streamlit vía cloudflared (sustituido por ngrok en v1.3.0)
-
-### v1.1.0 — 2026-05-26
-- Migración de `pip + venv` a **uv** como gestor de dependencias (10–100× más rápido en resolución)
-- Añadido `pyproject.toml` con grupos opcionales `cuda121`, `cuda118`, `cpu`
-- 6 diagramas Mermaid en README: flujo encoder-decoder, bloque FastConformer, cross-attention Q/K/V, NFA pipeline, preprocesamiento, chunking dinámico
-- Nota de compatibilidad para macOS Intel (`libiomp5.dylib`)
-
-### v1.0.0 — 2026-05-25
-- Implementación inicial: `app.py` con interfaz Streamlit de 3 pestañas (Demo de Inferencia, Arquitectura, Mecanismo de Atención)
-- Soporte para Canary-1B-v2 (ASR + AST, 25 idiomas) y Parakeet-TDT-0.6B-v3 (ASR)
-- README completo con marco teórico, metodología, resultados y referencias
-- `requirements.txt` con dependencias base
 
 ---
 
