@@ -1,0 +1,20 @@
+# ── Core framework ────────────────────────────────────────────────────────────
+# NVIDIA NeMo (ASR toolkit — incluye FastConformer, Canary, Parakeet)
+nemo_toolkit[asr]>=2.0.0
+
+# ── Interface ─────────────────────────────────────────────────────────────────
+streamlit>=1.35.0
+
+# ── Audio processing ──────────────────────────────────────────────────────────
+soundfile>=0.12.1
+librosa>=0.10.0
+
+# ── Deep learning backend ─────────────────────────────────────────────────────
+torch>=2.0.0
+torchaudio>=2.0.0
+
+# ── HuggingFace (descarga de pesos) ───────────────────────────────────────────
+huggingface_hub>=0.20.0
+
+# ── Utilidades ────────────────────────────────────────────────────────────────
+numpy>=1.24.0

@@ -1,0 +1,47 @@
+[project]
+name = "canary-parakeet-inference"
+version = "0.1.0"
+description = "Inferencia con Canary-1B-v2 y Parakeet-TDT-0.6B-v3 (FastConformer + Transformer Decoder)"
+requires-python = ">=3.10,<3.12"
+dependencies = [
+    # ── Interfaz ──────────────────────────────────────────────────────────────
+    "streamlit>=1.35.0",
+
+    # ── Framework NeMo (ASR / AST) ────────────────────────────────────────────
+    # Instala FastConformer, Canary, Parakeet y todo el stack NeMo
+    "nemo_toolkit[asr]>=2.0.0",
+
+    # ── Audio ─────────────────────────────────────────────────────────────────
+    "soundfile>=0.12.1",
+    "librosa>=0.10.0",
+
+    # ── HuggingFace (descarga de pesos preentrenados) ─────────────────────────
+    "huggingface_hub>=0.23.0",
+
+    # ── Utilidades ────────────────────────────────────────────────────────────
+    "numpy>=1.24.0,<2.0",       # NeMo requiere numpy <2
+]
+
+[project.optional-dependencies]
+# GPU con CUDA 12.1 (recomendado — instalar ANTES de nemo_toolkit)
+cuda121 = [
+    "torch>=2.1.0",
+    "torchaudio>=2.1.0",
+]
+# CPU solamente (más lento, útil para pruebas sin GPU)
+cpu = [
+    "torch>=2.1.0",
+    "torchaudio>=2.1.0",
+]
+
+[tool.uv]
+# Resuelve el entorno completo de forma determinista
+dev-dependencies = []
+
+# Índice de PyTorch con soporte CUDA 12.1
+# Actívalo si usas GPU: uv pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
+# Para CUDA 11.8: cambia cu121 → cu118
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
