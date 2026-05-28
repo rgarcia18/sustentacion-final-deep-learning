@@ -18,6 +18,16 @@ import io
 import time
 import tempfile
 import streamlit as st
+
+# Fix para Windows: NeMo deja abierto manifest.json en el directorio temporal,
+# lo que hace que shutil.rmtree falle con WinError 267 al hacer cleanup.
+# ignore_cleanup_errors=True (disponible en Python 3.10+) suprime ese error.
+_OrigTempDir = tempfile.TemporaryDirectory
+class _SafeTemporaryDirectory(_OrigTempDir):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("ignore_cleanup_errors", True)
+        super().__init__(*args, **kwargs)
+tempfile.TemporaryDirectory = _SafeTemporaryDirectory
 import numpy as np
 
 # ─── Configuración de página ─────────────────────────────────────────────────
@@ -65,20 +75,34 @@ st.markdown("""
 
 
 # ─── Carga de modelos (cacheado) ──────────────────────────────────────────────
+def _get_device() -> str:
+    """Retorna 'cuda' si hay GPU NVIDIA disponible, 'cpu' si no."""
+    try:
+        import torch
+        return "cuda" if torch.cuda.is_available() else "cpu"
+    except Exception:
+        return "cpu"
+
+
 @st.cache_resource(show_spinner=False)
 def load_canary():
     """Carga Canary-1B-v2 desde HuggingFace (se cachea en disco)."""
     try:
         import nemo.collections.asr as nemo_asr
-        model = nemo_asr.models.EncDecMultiTaskModel.from_pretrained("nvidia/canary-1b-v2")
+        device = _get_device()
+        model = nemo_asr.models.EncDecMultiTaskModel.from_pretrained(
+            "nvidia/canary-1b-v2",
+            map_location=device,
+        )
+        model = model.to(device)
         model.eval()
-        # Configurar decodificación greedy para mayor velocidad
+        # Decodificación greedy para mayor velocidad
         decode_cfg = model.cfg.decoding
         decode_cfg.beam.beam_size = 1
         model.change_decoding_strategy(decode_cfg)
-        return model, None
+        return model, None, device
     except Exception as e:
-        return None, str(e)
+        return None, str(e), "cpu"
 
 
 @st.cache_resource(show_spinner=False)
@@ -86,11 +110,16 @@ def load_parakeet():
     """Carga Parakeet-TDT-0.6B-v3 desde HuggingFace."""
     try:
         import nemo.collections.asr as nemo_asr
-        model = nemo_asr.models.EncDecRNNTBPEModel.from_pretrained("nvidia/parakeet-tdt-0.6b-v3")
+        device = _get_device()
+        model = nemo_asr.models.EncDecRNNTBPEModel.from_pretrained(
+            "nvidia/parakeet-tdt-0.6b-v3",
+            map_location=device,
+        )
+        model = model.to(device)
         model.eval()
-        return model, None
+        return model, None, device
     except Exception as e:
-        return None, str(e)
+        return None, str(e), "cpu"
 
 
 def save_uploaded_audio(uploaded_file) -> str:
@@ -122,7 +151,7 @@ def run_canary_inference(model, audio_path: str, task: str,
         task=task,            # 'asr' o 'ast'
         source_lang=src_lang,
         target_lang=tgt_lang,
-        pnc=False,
+        pnc="no",
     )
     elapsed = time.time() - t0
     # NeMo puede retornar lista de objetos o lista de strings
@@ -256,7 +285,7 @@ def main():
                     with out_col:
                         st.markdown("#### 🟢 Canary-1B-v2")
                         with st.spinner("Cargando modelo Canary-1B-v2..."):
-                            canary_model, err = load_canary()
+                            canary_model, err, device_c = load_canary()
 
                         if err:
                             st.error(f"Error al cargar Canary: {err}")
@@ -269,10 +298,11 @@ def main():
                             rtfx = duration / t_c if t_c > 0 else 0
                             st.markdown(f'<div class="result-box">{text_c}</div>',
                                         unsafe_allow_html=True)
-                            m1, m2, m3 = st.columns(3)
+                            m1, m2, m3, m4 = st.columns(4)
                             m1.metric("Tiempo", f"{t_c:.2f} s")
                             m2.metric("RTFx", f"{rtfx:.1f}×")
                             m3.metric("Tarea", task.upper())
+                            m4.metric("Dispositivo", device_c.upper())
 
                 # ── Parakeet
                 if use_parakeet:
@@ -280,7 +310,7 @@ def main():
                     with col_out:
                         st.markdown("#### 🔵 Parakeet-TDT-0.6B-v3")
                         with st.spinner("Cargando modelo Parakeet..."):
-                            para_model, err2 = load_parakeet()
+                            para_model, err2, device_p = load_parakeet()
 
                         if err2:
                             st.error(f"Error al cargar Parakeet: {err2}")
@@ -291,9 +321,10 @@ def main():
                             rtfx_p = duration / t_p if t_p > 0 else 0
                             st.markdown(f'<div class="result-box">{text_p}</div>',
                                         unsafe_allow_html=True)
-                            m1, m2 = st.columns(2)
+                            m1, m2, m3 = st.columns(3)
                             m1.metric("Tiempo", f"{t_p:.2f} s")
                             m2.metric("RTFx", f"{rtfx_p:.1f}×")
+                            m3.metric("Dispositivo", device_p.upper())
 
             # Limpiar temporal
             try:
