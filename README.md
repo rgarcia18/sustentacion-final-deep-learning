@@ -33,8 +33,8 @@ Este trabajo implementa inferencia funcional sobre dos modelos de reconocimiento
 
 > **Sekoyan, M., Koluguri, N. R., Tadevosyan, N., Zelasko, P., Bartley, T., Karpov, N., Balam, J., & Ginsburg, B. (2025). *Canary-1B-v2 & Parakeet-TDT-0.6B-v3: Efficient and High-Performance Models for Multilingual ASR and AST*. NVIDIA.**
 
-- 📄 Artículo completo (PDF): [arxiv.org/pdf/2509.14128](https://arxiv.org/pdf/2509.14128)
-- 🤗 HuggingFace Papers: [huggingface.co/papers/2509.14128](https://huggingface.co/papers/2509.14128)
+- Artículo completo (PDF): [arxiv.org/pdf/2509.14128](https://arxiv.org/pdf/2509.14128)
+- HuggingFace Papers: [huggingface.co/papers/2509.14128](https://huggingface.co/papers/2509.14128)
 - Modelo Canary-1B-v2: [huggingface.co/nvidia/canary-1b-v2](https://huggingface.co/nvidia/canary-1b-v2)
 - Modelo Parakeet-TDT-0.6B-v3: [huggingface.co/nvidia/parakeet-tdt-0.6b-v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3)
 - Framework NeMo: [github.com/NVIDIA/NeMo](https://github.com/NVIDIA/NeMo)
